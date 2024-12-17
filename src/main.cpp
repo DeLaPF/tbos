@@ -13,6 +13,20 @@
 #include "gl_helpers.hpp"
 #include "shader.hpp"
 
+// TODO: look into supporting search for shaders, relative to run path
+const int numShaders = 3;
+const char* shaderNames[numShaders] = {
+    "TBOS 02",
+    "TBOS 03",
+    "Uniform Test"
+};
+std::string shaderPaths[numShaders] = {
+    "res/shaders/02.shader",
+    "res/shaders/03.shader",
+    "res/shaders/test_uniforms.shader"
+};
+int shaderIds[numShaders] = {-1, -1, -1};
+
 int main(int argc, char **argv) {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -85,14 +99,14 @@ int main(int argc, char **argv) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, texCoord));
     glEnableVertexAttribArray(1);
 
-    // TODO: make selectable
-    ParsedShader shaderSource = parseShader("res/shaders/test_uniforms.shader");
-    unsigned int shader = createShader(shaderSource.Vertex, shaderSource.Fragment);
-    glUseProgram(shader);
-
-    int uMouse = glGetUniformLocation(shader, "u_Mouse");
-    int uRes = glGetUniformLocation(shader, "u_Res");
-    int uTime = glGetUniformLocation(shader, "u_Time");
+    for (int i = 0; i < numShaders; i++) {
+        ParsedShader shaderSource = parseShader(shaderPaths[i]);
+        // TODO: Error check
+        unsigned int shader = createShader(shaderSource.Vertex, shaderSource.Fragment);
+        // TODO: Error check
+        shaderIds[i] = shader;
+    }
+    int shaderInd = 0;
 
     // Main loop
     bool running = true;
@@ -113,6 +127,19 @@ int main(int argc, char **argv) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
+
+        // Shader selector
+        ImGui::Begin("Shader Select");
+        ImGui::ListBox("S", &shaderInd, shaderNames, numShaders, 4);
+        ImGui::End();
+
+        // Update loaded shader
+        unsigned int shader = shaderIds[shaderInd];
+        glUseProgram(shader);
+        // If this is slow may want to move to list def with shaderIds
+        int uMouse = glGetUniformLocation(shader, "u_Mouse");
+        int uRes = glGetUniformLocation(shader, "u_Res");
+        int uTime = glGetUniformLocation(shader, "u_Time");
 
         // Update uniforms
         int mx, my, w, h;
@@ -137,7 +164,11 @@ int main(int argc, char **argv) {
     }
 
     // gl cleanup
-    glDeleteProgram(shader);
+    for (int i = 0; i < numShaders; i++) {
+        if (shaderIds[i] != -1) {
+            glDeleteProgram(shaderIds[i]);
+        }
+    }
 
     // ImGui Cleanup
     ImGui_ImplOpenGL3_Shutdown();
