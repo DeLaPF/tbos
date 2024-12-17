@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
         "OpenGL with SDL",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         800, 600,
-        SDL_WINDOW_OPENGL
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
     );
     SDL_GLContext glContext = SDL_GL_CreateContext(window);
     if (!glContext) {
@@ -121,6 +121,12 @@ int main(int argc, char **argv) {
                 && event.window.event == SDL_WINDOWEVENT_CLOSE
                 && event.window.windowID == SDL_GetWindowID(window))) {
                 running = false;
+            } else if (event.type == SDL_WINDOWEVENT) {
+                if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                    int w, h;
+                    SDL_GetWindowSize(window, &w, &h);
+                    glViewport(0, 0, w, h);
+                }
             }
         }
         // Start the Dear ImGui frame
