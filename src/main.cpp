@@ -7,6 +7,7 @@
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
 #include "SDL.h"
+#include "SDL_mouse.h"
 #include "SDL_video.h"
 
 #include "gl_helpers.hpp"
@@ -85,13 +86,13 @@ int main(int argc, char **argv) {
     glEnableVertexAttribArray(1);
 
     // TODO: make selectable
-    ParsedShader shaderSource = parseShader("res/shaders/03.shader");
+    ParsedShader shaderSource = parseShader("res/shaders/test_uniforms.shader");
     unsigned int shader = createShader(shaderSource.Vertex, shaderSource.Fragment);
     glUseProgram(shader);
 
-    unsigned int curTime = SDL_GetTicks();
+    int uMouse = glGetUniformLocation(shader, "u_Mouse");
+    int uRes = glGetUniformLocation(shader, "u_Res");
     int uTime = glGetUniformLocation(shader, "u_Time");
-    glUniform1f(uTime, curTime/1000.0f);
 
     // Main loop
     bool running = true;
@@ -114,8 +115,12 @@ int main(int argc, char **argv) {
         ImGui::NewFrame();
 
         // Update uniforms
-        curTime = SDL_GetTicks();
-        glUniform1f(uTime, curTime/1000.0f);
+        int mx, my, w, h;
+        SDL_GetMouseState(&mx, &my);
+        SDL_GetWindowSize(window, &w, &h);
+        glUniform2f(uMouse, (float)mx, (float)my);
+        glUniform2f(uRes, (float)w, (float)h);
+        glUniform1f(uTime, SDL_GetTicks()/1000.0f);
 
         // Clear main screen
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
