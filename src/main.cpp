@@ -85,9 +85,13 @@ int main(int argc, char **argv) {
     glEnableVertexAttribArray(1);
 
     // TODO: make selectable
-    ParsedShader shaderSource = parseShader("res/shaders/01.shader");
+    ParsedShader shaderSource = parseShader("res/shaders/03.shader");
     unsigned int shader = createShader(shaderSource.Vertex, shaderSource.Fragment);
     glUseProgram(shader);
+
+    unsigned int curTime = SDL_GetTicks();
+    int uTime = glGetUniformLocation(shader, "u_Time");
+    glUniform1f(uTime, curTime/1000.0f);
 
     // Main loop
     bool running = true;
@@ -108,6 +112,10 @@ int main(int argc, char **argv) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
+
+        // Update uniforms
+        curTime = SDL_GetTicks();
+        glUniform1f(uTime, curTime/1000.0f);
 
         // Clear main screen
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
