@@ -11,35 +11,7 @@
 #include "SDL_video.h"
 
 #include "gl_helpers.hpp"
-#include "shader.hpp"
-
-// TODO: look into supporting search for shaders, relative to run path
-const int numShaders = 10;
-const char* shaderNames[numShaders] = {
-    "TBOS 05 (sin anim)",
-    "TBOS 05 (smooth step diff)",
-    "TBOS 05 (smooth step)",
-    "TBOS 05 (step)",
-    "TBOS 05 (exponent)",
-    "TBOS 05 (linear)",
-    "TBOS 03 (uv)",
-    "TBOS 03",
-    "TBOS 02 (st)",
-    "Uniform Test"
-};
-std::string shaderPaths[numShaders] = {
-    "res/shaders/05_5.shader",
-    "res/shaders/05_4.shader",
-    "res/shaders/05_3.shader",
-    "res/shaders/05_2.shader",
-    "res/shaders/05_1.shader",
-    "res/shaders/05_0.shader",
-    "res/shaders/03_uv.shader",
-    "res/shaders/03_st.shader",
-    "res/shaders/02.shader",
-    "res/shaders/test_uniforms.shader"
-};
-int shaderIds[numShaders] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+#include "shader_linker.hpp"
 
 int main(int argc, char **argv) {
     // Initialize SDL
@@ -113,13 +85,10 @@ int main(int argc, char **argv) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, texCoord));
     glEnableVertexAttribArray(1);
 
-    for (int i = 0; i < numShaders; i++) {
-        ParsedShader shaderSource = parseShader(shaderPaths[i]);
-        // TODO: Error check
-        unsigned int shader = createShader(shaderSource.Vertex, shaderSource.Fragment);
-        // TODO: Error check
-        shaderIds[i] = shader;
-    }
+    std::vector<ShaderPair> pairs = linkShaders("res/shaders");
+    std::vector<const char*> names;
+    for (const auto& pair : pairs) { names.push_back(&pair.name[0]); }
+    std::vector<unsigned int> shaderIds = compileShaders(pairs);
     int shaderInd = 0;
 
     // Main loop
@@ -150,7 +119,7 @@ int main(int argc, char **argv) {
 
         // Shader selector
         ImGui::Begin("Shader Select");
-        ImGui::ListBox("S", &shaderInd, shaderNames, numShaders, 4);
+        ImGui::ListBox("S", &shaderInd, &names[0], (int)names.size(), 4);
         ImGui::End();
 
         // Update loaded shader
@@ -184,7 +153,7 @@ int main(int argc, char **argv) {
     }
 
     // gl cleanup
-    for (int i = 0; i < numShaders; i++) {
+    for (int i = 0; i < shaderIds.size(); i++) {
         if (shaderIds[i] != -1) {
             glDeleteProgram(shaderIds[i]);
         }

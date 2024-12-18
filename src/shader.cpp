@@ -7,15 +7,12 @@
 
 #include "glad/gl.h"
 
-ParsedShader parseShader(const std::string& filepath)
+ParsedShader parseShader(const std::string& filepath, ShaderType type)
 {
     std::ifstream stream(filepath);
-
-    enum class ShaderType { NONE = -1, VERTEX = 0, FRAGMENT = 1 };
-
     std::string line;
     std::stringstream ss[2];
-    ShaderType type = ShaderType::NONE;
+    ShaderType curType = type;
     while (getline(stream, line)) {
         if (line.find("#shader") != std::string::npos) {
             if (line.find("vertex") != std::string::npos) {
@@ -29,6 +26,11 @@ ParsedShader parseShader(const std::string& filepath)
     }
 
     return { ss[0].str(), ss[1].str() };
+}
+
+ParsedShader parseShader(const std::string& filepath)
+{
+    return parseShader(filepath, ShaderType::NONE);
 }
 
 unsigned int compileShader(unsigned int type, const std::string& source)

@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 
-#include "shader.hpp"
-
 // TODO:
 // take in relative path to `shaderDir`
 // collect all files in `shaderDir`
@@ -20,7 +18,8 @@ struct ShaderPair {
     std::string name;
     std::string vertPath;
     std::string fragPath;
+    bool isCombined;
 };
 
 std::vector<ShaderPair> linkShaders(const char* shaderDir);
-std::vector<ParsedShader> compileShaders(const std::vector<ShaderPair>& shaderPairs);
+std::vector<unsigned int> compileShaders(const std::vector<ShaderPair>& shaderPairs);

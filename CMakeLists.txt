@@ -10,11 +10,8 @@ set(SOURCES
 
     src/gl_helpers.cpp
     src/shader.cpp
+    src/shader_linker.cpp
 )
-# set(HEADER_FILES
-#     src/shader.hpp
-# )
-# add_executable(${PROJECT_NAME} ${SOURCES} ${HEADER_FILES})
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
