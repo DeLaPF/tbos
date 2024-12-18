@@ -14,18 +14,20 @@
 #include "shader.hpp"
 
 // TODO: look into supporting search for shaders, relative to run path
-const int numShaders = 3;
+const int numShaders = 4;
 const char* shaderNames[numShaders] = {
-    "TBOS 02",
+    "TBOS 02 (st)",
+    "TBOS 03 (uv)",
     "TBOS 03",
     "Uniform Test"
 };
 std::string shaderPaths[numShaders] = {
     "res/shaders/02.shader",
-    "res/shaders/03.shader",
+    "res/shaders/03_st.shader",
+    "res/shaders/03_uv.shader",
     "res/shaders/test_uniforms.shader"
 };
-int shaderIds[numShaders] = {-1, -1, -1};
+int shaderIds[numShaders] = {-1, -1, -1, -1};
 
 int main(int argc, char **argv) {
     // Initialize SDL
