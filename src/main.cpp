@@ -85,10 +85,18 @@ int main(int argc, char **argv) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, texCoord));
     glEnableVertexAttribArray(1);
 
-    std::vector<ShaderPair> pairs = linkShaders("res/shaders");
+    const char* relPath = "res/shaders";
     std::vector<const char*> names;
+    std::vector<ShaderPair> pairs = linkShaders(relPath);
     for (const auto& pair : pairs) { names.push_back(&pair.name[0]); }
     std::vector<unsigned int> shaderIds = compileShaders(pairs);
+    if (shaderIds.size() < 1) {
+        std::cout << std::format(
+            "ERROR [Shaders]: no valid shaders found at: {}",
+            relPath
+        ) << std::endl;
+        exit(1);
+    }
     int shaderInd = 0;
 
     // Main loop
