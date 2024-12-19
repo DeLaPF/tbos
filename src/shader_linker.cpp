@@ -43,7 +43,7 @@ std::vector<ShaderPair> linkShaders(const char* shaderDir)
         if (preExt == ".vert") {
             if (i < shaderFiles.size()-1 && stem == shaderFiles[i+1].stem().string()) {
                 pairs.push_back(ShaderPair{
-                    .name=curFile.stem().string(),
+                    .name=curFile.stem().stem().string(),
                     .vertPath=curFile.string(),
                     .fragPath=shaderFiles[i+1].string(),
                     .isCombined=false,
@@ -51,7 +51,7 @@ std::vector<ShaderPair> linkShaders(const char* shaderDir)
                 i++;
             } else if (hasDefaultFrag) {
                 pairs.push_back(ShaderPair{
-                    .name=curFile.stem().string(),
+                    .name=curFile.stem().stem().string(),
                     .vertPath=curFile.string(),
                     .fragPath=(root / "default.frag.glsl").string(),
                     .isCombined=false,
@@ -65,7 +65,7 @@ std::vector<ShaderPair> linkShaders(const char* shaderDir)
         } else if (preExt == ".frag") {
             if (hasDefaultVert) {
                 pairs.push_back(ShaderPair{
-                    .name=curFile.stem().string(),
+                    .name=curFile.stem().stem().string(),
                     .vertPath=(root / "default.vert.glsl").string(),
                     .fragPath=curFile.string(),
                     .isCombined=false,

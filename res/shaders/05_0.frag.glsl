@@ -1,21 +1,4 @@
-#shader vertex
 #version 330 core
-
-layout(location = 0) in vec4 pos;
-layout(location = 1) in vec2 texCoord;
-
-out vec2 vTexCoord;
-
-void main()
-{
-    vTexCoord = texCoord;
-    gl_Position = pos;
-};
-
-#shader fragment
-#version 330 core
-
-#define PI 3.14159265358979323
 
 in vec2 vTexCoord;
 
@@ -32,7 +15,7 @@ void main()
 {
     vec2 st = gl_FragCoord.xy/u_Res;
 
-    float y = sin((st.x+u_Time/2.0)*PI*6.0)/2.0 + 0.5;
+    float y = st.x; // y = x
     float pct = plot(st, y);
     vec3 color = (1.0-pct)*vec3(y) + pct*vec3(0.0, 1.0, 0.0);
 

@@ -1,18 +1,3 @@
-#shader vertex
-#version 330 core
-
-layout(location = 0) in vec4 pos;
-layout(location = 1) in vec2 texCoord;
-
-out vec2 vTexCoord;
-
-void main()
-{
-    vTexCoord = texCoord;
-    gl_Position = pos;
-};
-
-#shader fragment
 #version 330 core
 
 in vec2 vTexCoord;
@@ -30,7 +15,7 @@ void main()
 {
     vec2 st = gl_FragCoord.xy/u_Res;
 
-    float y = st.x; // y = x
+    float y = step(0.5, st.x); // y = 0 if x < n else 1
     float pct = plot(st, y);
     vec3 color = (1.0-pct)*vec3(y) + pct*vec3(0.0, 1.0, 0.0);
 
