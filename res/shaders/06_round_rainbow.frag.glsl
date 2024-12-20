@@ -8,15 +8,11 @@ uniform vec2 u_Mouse;
 uniform vec2 u_Res;
 uniform float u_Time;
 
-vec3 selInRange(float val, float min, float max)
+float selInRange(float val, float min, float max)
 {
     float offTilMin = step(min, val);
     float offTilMax = step(max, val);
-    float sel = offTilMin-offTilMax;
-
-    vec3 black = vec3(0.0);
-    vec3 white = vec3(1.0);
-    return (1.0-sel)*black + sel*white;
+    return offTilMin-offTilMax;
 }
 
 void main()
