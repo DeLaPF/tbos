@@ -11,8 +11,8 @@ std::vector<ShaderPair> linkShaders(const char* shaderDir)
 {
     std::vector<ShaderPair> pairs;
     std::vector<std::filesystem::path> shaderFiles;
-    bool hasDefaultVert = false;
-    bool hasDefaultFrag = false;
+    std::string defaultVertPath = "";
+    std::string defaultFragPath = "";
     std::filesystem::path root(shaderDir);
 
     for (const auto &entry : std::filesystem::directory_iterator(root)) {
@@ -23,9 +23,9 @@ std::vector<ShaderPair> linkShaders(const char* shaderDir)
             if (preExt == ".vert" || preExt == ".frag" || ext == ".glsl") {
                 if (stem == "default") {
                     if (preExt == ".vert") {
-                        hasDefaultVert = true;
+                        defaultVertPath = (root / "default.vert.glsl").string();
                     } else if (preExt == ".frag") {
-                        hasDefaultFrag = true;
+                        defaultFragPath = (root / "default.frag.glsl").string();
                     }
                 } else {
                     shaderFiles.push_back(entry.path());
@@ -40,47 +40,44 @@ std::vector<ShaderPair> linkShaders(const char* shaderDir)
         auto stem = curFile.stem().stem().string();
         auto preExt = curFile.stem().extension().string();
         auto ext = curFile.extension().string();
+        std::string vertPath = curFile.string();
+        std::string fragPath = curFile.string();
+        bool isCombined = false;
+        std::string linkError = "";
+
         if (preExt == ".vert") {
-            if (i < shaderFiles.size()-1 && stem == shaderFiles[i+1].stem().string()) {
-                pairs.push_back(ShaderPair{
-                    .name=curFile.stem().stem().string(),
-                    .vertPath=curFile.string(),
-                    .fragPath=shaderFiles[i+1].string(),
-                    .isCombined=false,
-                });
+            if (i < shaderFiles.size()-1 && stem == shaderFiles[i+1].stem().stem().string()) {
+                fragPath = shaderFiles[i+1].string();
                 i++;
-            } else if (hasDefaultFrag) {
-                pairs.push_back(ShaderPair{
-                    .name=curFile.stem().stem().string(),
-                    .vertPath=curFile.string(),
-                    .fragPath=(root / "default.frag.glsl").string(),
-                    .isCombined=false,
-                });
+            } else if (!defaultFragPath.empty()) {
+                fragPath = defaultFragPath;
             } else {
-                std::cout << std::format(
-                    "{}.vert is missing matching {}.frag (or default.frag)",
+                linkError = std::format(
+                    "{}.vert.glsl is missing matching {}.frag.glsl (no default.frag.glsl)",
                     stem, stem
-                ) << std::endl;
+                );
             }
         } else if (preExt == ".frag") {
-            if (hasDefaultVert) {
-                pairs.push_back(ShaderPair{
-                    .name=curFile.stem().stem().string(),
-                    .vertPath=(root / "default.vert.glsl").string(),
-                    .fragPath=curFile.string(),
-                    .isCombined=false,
-                });
+            if (!defaultVertPath.empty()) {
+                vertPath = defaultVertPath;
             } else {
-                std::cout << std::format(
-                    "{}.frag is missing matching {}.vert (or default.vert)",
+                linkError = std::format(
+                    "{}.frag.glsl is missing matching {}.vert.glsl (no default.vert.glsl)",
                     stem, stem
-                ) << std::endl;
+                );
             }
         } else if (ext == ".glsl") {
+            isCombined=true;
+        }
+
+        if (!linkError.empty()) {
+            std::cout << linkError << std::endl;
+        } else {
             pairs.push_back(ShaderPair{
-                .name=curFile.stem().string(),
-                .vertPath=curFile.string(),
-                .isCombined=true,
+                .name=stem,
+                .vertPath=vertPath,
+                .fragPath=fragPath,
+                .isCombined=isCombined,
             });
         }
     }
