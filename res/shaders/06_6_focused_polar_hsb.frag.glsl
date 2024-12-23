@@ -54,15 +54,15 @@ float toNormRad(float degrees)
 void main()
 {
     vec2 st = gl_FragCoord.xy/u_Res;
-    float focusColor = 180.0;
-    float focusWidth = 5.0;
+    float focusColor = 225.0;
+    float focusWidth = 90.0;
 
     vec2 toCenter = vec2(0.5) - st;
     float angle = max(atan(toCenter.y, toCenter.x) + PI, 0.0);
     float radius = length(toCenter)*2.0;
 
     float transAngle = mod(angle-toNormRad(focusColor), PI*2.0);
-    float shapedAngle = terpP(transAngle, focusWidth);
+    float shapedAngle = terpP(transAngle, toNormRad(focusWidth));
     float untransShaped = mod(shapedAngle+toNormRad(focusColor), 1.0);
 
     vec3 color = hsb2rgb(vec3(untransShaped, radius, 1.0));
