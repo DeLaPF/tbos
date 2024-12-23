@@ -54,12 +54,21 @@ float toNormRad(float degrees)
 void main()
 {
     vec2 st = gl_FragCoord.xy/u_Res;
-    float focusColor = 225.0;
-    float focusWidth = 90.0;
 
     vec2 toCenter = vec2(0.5) - st;
     float angle = max(atan(toCenter.y, toCenter.x) + PI, 0.0);
     float radius = length(toCenter)*2.0;
+
+    float focusColor = 225.0;
+    float focusWidth = 90.0;
+
+    vec2 mst = u_Mouse.xy/u_Res;
+    vec2 mToCenter = vec2(0.5) - mst;
+    float mAngle = max(atan(mToCenter.y, mToCenter.x) + PI, 0.0);
+    float mInCircle = 1.0-step(0.5, length(mToCenter));
+    // focusColor = (mInCircle)*(mAngle*(180.0/PI)) + (1.0-mInCircle)*focusColor;
+    focusColor = mAngle*(180.0/PI);
+    focusWidth = (mInCircle)*focusWidth + (1.0-mInCircle)*359.9;
 
     float transAngle = mod(angle-toNormRad(focusColor), PI*2.0);
     float shapedAngle = terpP(transAngle, toNormRad(focusWidth));
