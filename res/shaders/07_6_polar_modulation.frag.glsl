@@ -8,11 +8,6 @@ uniform vec2 u_Mouse;
 uniform vec2 u_Res;
 uniform float u_Time;
 
-float circleDF(vec2 p, vec2 origin)
-{
-    return length(p-origin);
-}
-
 float selGear(float angle, float radius, float numTeeth, float toothW, float coreR, float toothR)
 {
     toothW = toothW*2.0 - 1.0;
